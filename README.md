@@ -1,3 +1,20 @@
-# Bootcamp-project
+## Bootcamp-project
 En este repositorio subiré los códigos de la creación de mi aplicación de gestión de tareas llamada TaskFlow.
 Con TaskFlow podremos crear, completar, eliminar y filtrar tareas.
+TaskFlow es un gestor de tareas sencillo, rápido y con un diseño que mola.
+
+## ✨ ¿Qué tiene de especial?
+
+* **Todo a la vista:** Panel de control arriba para ver cuántas tareas llevas hechas y cuáles te faltan. 📊
+* **Diseño en rejilla:** Las tareas no se amontonan, se organizan en cuadritos limpios (gracias al CSS Grid). 🧱
+* **Modo Oscuro/Claro:** Para que no se te quemen los ojos si te pones a organizar cosas por la noche. 🌓
+* **Control total:** Barra de progreso real para cada tarea y botones rápidos para moverte entre estados. ⚡
+
+## 🛠️ Hecho con:
+* **Backend:** Python + Flask (el cerebro).
+* **Frontend:** HTML, CSS y JavaScript (la cara bonita).
+* **Iconos:** Font Awesome.
+
+* Voy a subir captura de el croquis aqui.
+*![Captura de TaskFlow](https://github.com/user-attachments/assets/4f206e97-df78-4bd3-a16a-18e43ddf3d3a)
+
