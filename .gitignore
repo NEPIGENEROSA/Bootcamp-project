@@ -1,0 +1,14 @@
+# Node
+node_modules/
+
+# Sistema Operativo
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Python (por si acaso)
+venv/
+__pycache__/
+*.pyc
