@@ -16,5 +16,4 @@ TaskFlow es un gestor de tareas sencillo, rápido y con un diseño que mola.
 * **Iconos:** Font Awesome.
 
 * Voy a subir captura de el croquis aqui.
-*![Captura de TaskFlow](https://github.com/user-attachments/assets/4f206e97-df78-4bd3-a16a-18e43ddf3d3a)
-
+<img width="1016" height="983" alt="Captura de pantalla 2026-04-07 234227" src="https://github.com/user-attachments/assets/63f44994-9b30-482d-820e-f30817c89319" />
