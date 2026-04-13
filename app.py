@@ -6,4 +6,5 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-# No pongas nada más por ahora, Vercel solo necesita el objeto "app"
+if __name__ == "__main__":
+    app.run()
