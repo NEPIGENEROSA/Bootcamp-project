@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - Pro</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <button class="btn-mode" onclick="toggleDarkMode()">🌓 Cambiar Modo</button>
+
+    <header>
+        <h1>TaskFlow</h1>
+        <form id="formulario-tarea" class="input-group">
+            <input type="text" id="input-tarea" placeholder="¿Qué quieres lograr hoy?" required>
+            <button type="submit">Añadir Tarea</button>
+        </form>
+    </header>
+
+    <main class="main-content">
+        <div class="columna-principal">
+            <h2>🚀 Tareas en Curso (Máximo 3)</h2>
+            <div id="lista-tareas-activas"></div> <hr style="margin: 30px 0; opacity: 0.1;">
+
+            <details>
+                <summary class="btn-archivo">📦 Ver Archivo (Pendientes y Completadas)</summary>
+                <div id="lista-archivo"></div> </details>
+        </div>
+
+        <aside id="estadisticas">
+            <h2><i class="fas fa-chart-pie"></i> Resumen</h2>
+            <hr>
+            <div class="stat-item">
+                <p><i class="fas fa-list-ul"></i> Total: <strong id="total-tareas">0</strong></p>
+            </div>
+            <div class="stat-item">
+                <p><i class="fas fa-spinner fa-spin"></i> En curso: <strong id="en-proceso-tareas">0</strong></p>
+            </div>
+            <div class="stat-item">
+                <p><i class="fas fa-check-circle"></i> Hechas: <strong id="completadas-tareas">0</strong></p>
+            </div>
+            <div class="stat-item">
+                <p><i class="fas fa-clock"></i> Espera: <strong id="pendientes-tareas">0</strong></p>
+            </div>
+        </aside>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

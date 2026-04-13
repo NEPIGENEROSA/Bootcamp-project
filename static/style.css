@@ -1,0 +1,150 @@
+/* 1. Variables y Temas (Se mantienen) */
+:root {
+    --bg-color: #f0f7ff;
+    --card-bg: #ffffff;
+    --text-color: #1a2a3a;
+    --primary-blue: #00a8ff;
+    --accent-blue: #e3f2fd;
+    --shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+body.dark-mode {
+    --bg-color: #0a192f;
+    --card-bg: #172a45;
+    --text-color: #f0f7ff;
+    --primary-blue: #306aff;
+    --accent-blue: #1d3557;
+}
+
+/* 2. Estilos Base */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    text-align: center;
+    padding: 30px 0;
+}
+
+.input-group {
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    display: inline-flex;
+    gap: 10px;
+}
+
+/* 3. Layout Principal Vertical */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    max-width: 1100px;
+    gap: 20px;
+}
+
+/* 4. Resumen Arriba Centrado */
+#estadisticas {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    order: -1; /* Lo mantiene arriba */
+}
+
+.stats-grid {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* 5. EL CAMBIO: Cuadrícula de tareas (Cards pequeñas) */
+#lista-tareas-activas, #lista-archivo {
+    display: grid;
+    /* Esto hace que las tareas sean cuadraditos de unos 300px */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.columna-principal {
+    width: 100%;
+}
+
+.task-card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    border-left: 5px solid var(--primary-blue);
+    /* Altura fija o mínima para que parezcan contenedores uniformes */
+    min-height: 180px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* 6. Otros detalles */
+.progress-container {
+    background: var(--accent-blue);
+    border-radius: 10px;
+    height: 8px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: var(--primary-blue);
+    height: 100%;
+}
+
+.btn-archivo {
+    background: var(--accent-blue);
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 20px 0;
+    display: block;
+    text-align: center;
+}
+
+button {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-mode {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+}
+
+/* Estilos para los iconos del resumen */
+.fa-list-ul { color: #7f8c8d; }       /* Gris para Total */
+.fa-spinner { color: #3498db; }       /* Azul para En Curso */
+
+/* ESTOS SON LOS QUE DEBES CAMBIAR: */
+.fa-check-circle { color: #2ecc71 !important; }  /* Verde esmeralda */
+.fa-clock { color: #f1c40f !important; }         /* Amarillo vibrante */
