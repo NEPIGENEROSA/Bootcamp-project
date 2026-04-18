@@ -1,4 +1,4 @@
-/* 1. Variables y Temas (Se mantienen) */
+/* 1. Variables y Temas */
 :root {
     --bg-color: #f0f7ff;
     --card-bg: #ffffff;
@@ -22,14 +22,70 @@ body {
     color: var(--text-color);
     font-family: 'Segoe UI', sans-serif;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    min-height: 100vh;
 }
 
 header {
+    width: 100%;
     text-align: center;
-    padding: 30px 0;
+    padding: 20px 0;
+}
+
+/* 3. Layout Principal (Dos Columnas) */
+.main-content {
+    display: flex;
+    flex-direction: row; /* Cambio a filas para poner lateral */
+    align-items: flex-start;
+    justify-content: center;
+    width: 95%;
+    max-width: 1300px;
+    margin: 0 auto;
+    gap: 30px;
+}
+
+/* 4. Columna Izquierda (Sidebar: Resumen y Filtros) */
+#estadisticas {
+    flex: 1; /* Ocupa menos espacio */
+    max-width: 300px;
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky; /* Se queda fijo al hacer scroll */
+    top: 20px;
+}
+
+.filter-container {
+    display: flex;
+    flex-direction: column; /* Filtros uno debajo de otro */
+    gap: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filter-group select, .priority-select {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--primary-blue);
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+/* 5. Columna Derecha (Acción y Listas) */
+.columna-principal {
+    flex: 3; /* Ocupa mucho más espacio */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .input-group {
@@ -37,53 +93,24 @@ header {
     padding: 15px;
     border-radius: 15px;
     box-shadow: var(--shadow);
-    display: inline-flex;
+    display: flex;
     gap: 10px;
-}
-
-/* 3. Layout Principal Vertical */
-.main-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 90%;
-    max-width: 1100px;
-    gap: 20px;
-}
-
-/* 4. Resumen Arriba Centrado */
-#estadisticas {
-    background: var(--card-bg);
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: var(--shadow);
     width: 100%;
-    max-width: 800px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    order: -1; /* Lo mantiene arriba */
+    box-sizing: border-box;
 }
 
-.stats-grid {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    flex-wrap: wrap;
-    gap: 15px;
+#input-tarea {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
 }
 
-/* 5. EL CAMBIO: Cuadrícula de tareas (Cards pequeñas) */
+/* Cuadrícula de tareas */
 #lista-tareas-activas, #lista-archivo {
     display: grid;
-    /* Esto hace que las tareas sean cuadraditos de unos 300px */
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
-    width: 100%;
-    margin-top: 15px;
-}
-
-.columna-principal {
     width: 100%;
 }
 
@@ -93,14 +120,32 @@ header {
     border-radius: 12px;
     box-shadow: var(--shadow);
     border-left: 5px solid var(--primary-blue);
-    /* Altura fija o mínima para que parezcan contenedores uniformes */
-    min-height: 180px; 
+    min-height: 150px; 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
-/* 6. Otros detalles */
+/* 6. Badges de Prioridad */
+.badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-weight: bold;
+    align-self: flex-start;
+}
+.badge-Alta { background: #ff4d4d; color: white; }
+.badge-Media { background: #ffad33; color: white; }
+.badge-Baja { background: #33cc33; color: white; }
+
+/* 7. Otros Detalles */
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 5px 0;
+}
+
 .progress-container {
     background: var(--accent-blue);
     border-radius: 10px;
@@ -114,37 +159,33 @@ header {
     height: 100%;
 }
 
-.btn-archivo {
-    background: var(--accent-blue);
-    padding: 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
-    margin: 20px 0;
-    display: block;
-    text-align: center;
-}
-
 button {
     background: var(--primary-blue);
     color: white;
     border: none;
-    padding: 8px 15px;
-    border-radius: 6px;
+    padding: 10px 20px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
+    transition: 0.3s;
 }
 
-.btn-mode {
-    position: fixed;
-    top: 20px;
-    right: 20px;
+button:hover { opacity: 0.8; }
+
+.btn-mode { position: fixed; top: 20px; right: 20px; z-index: 100; }
+
+.btn-archivo {
+    background: var(--accent-blue);
+    padding: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    border: 1px dashed var(--primary-blue);
 }
 
-/* Estilos para los iconos del resumen */
-.fa-list-ul { color: #7f8c8d; }       /* Gris para Total */
-.fa-spinner { color: #3498db; }       /* Azul para En Curso */
-
-/* ESTOS SON LOS QUE DEBES CAMBIAR: */
-.fa-check-circle { color: #2ecc71 !important; }  /* Verde esmeralda */
-.fa-clock { color: #f1c40f !important; }         /* Amarillo vibrante */
+/* Iconos */
+.fa-list-ul { color: #7f8c8d; }
+.fa-spinner { color: #3498db; }
+.fa-check-circle { color: #2ecc71 !important; }
+.fa-clock { color: #f1c40f !important; }

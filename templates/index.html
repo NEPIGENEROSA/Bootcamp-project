@@ -16,18 +16,49 @@
         <h1>TaskFlow</h1>
         <form id="formulario-tarea" class="input-group">
             <input type="text" id="input-tarea" placeholder="¿Qué quieres lograr hoy?" required>
+            
+            <select id="input-prioridad" class="priority-select">
+                <option value="Alta">Alta 🔥</option>
+                <option value="Media" selected>Media ⚡</option>
+                <option value="Baja">Baja ✅</option>
+            </select>
+
             <button type="submit">Añadir Tarea</button>
         </form>
     </header>
 
     <main class="main-content">
         <div class="columna-principal">
+            
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label><i class="fas fa-filter"></i> Filtrar Prioridad:</label>
+                    <select id="filter-priority">
+                        <option value="all">Todas</option>
+                        <option value="Alta">Altas</option>
+                        <option value="Media">Medias</option>
+                        <option value="Baja">Bajas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-sort-amount-down"></i> Ordenar por:</label>
+                    <select id="sort-tasks">
+                        <option value="date">Más recientes</option>
+                        <option value="alpha">Nombre (A-Z)</option>
+                        <option value="priority">Prioridad (A-M-B)</option>
+                    </select>
+                </div>
+            </div>
+
             <h2>🚀 Tareas en Curso (Máximo 3)</h2>
-            <div id="lista-tareas-activas"></div> <hr style="margin: 30px 0; opacity: 0.1;">
+            <div id="lista-tareas-activas"></div> 
+            
+            <hr style="margin: 30px 0; opacity: 0.1;">
 
             <details>
                 <summary class="btn-archivo">📦 Ver Archivo (Pendientes y Completadas)</summary>
-                <div id="lista-archivo"></div> </details>
+                <div id="lista-archivo"></div> 
+            </details>
         </div>
 
         <aside id="estadisticas">
