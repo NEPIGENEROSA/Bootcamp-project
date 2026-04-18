@@ -190,29 +190,64 @@ button:hover { opacity: 0.8; }
 .fa-check-circle { color: #2ecc71 !important; }
 .fa-clock { color: #f1c40f !important; }
 
-/* Estilos para el Footer */
 .main-footer {
+    background: var(--card-bg);
+    color: var(--text-color);
+    padding: 20px 0 10px 0; /* Padding mucho más pequeño */
+    margin-top: 30px;
     width: 100%;
-    padding: 20px 0;
-    margin-top: 40px;
-    background-color: #e0e0e0; /* Gris claro para modo normal */
-    color: #555;
-    text-align: center;
+    border-top: 1px solid var(--accent-blue);
+}
+
+.footer-content {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-around;
+    align-items: center; /* Centrado vertical para que sea más estrecho */
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-section h3 {
+    color: var(--primary-blue);
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.footer-section p {
+    font-size: 0.8em;
+    margin: 5px 0 0 0;
+}
+
+/* Estilo para el enlace directo de GitHub */
+.git-link {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: bold;
     font-size: 0.9em;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
 }
 
-/* Ajuste automático para el Modo Noche */
-body.dark-mode .main-footer {
-    background-color: #1a2a3a; /* Gris muy oscuro/azulado para modo noche */
-    color: #a0aec0;
-    border-top: 1px solid rgba(255,255,255,0.1);
+.git-link:hover {
+    color: var(--primary-blue);
+    transform: scale(1.05);
 }
 
-.main-footer p {
-    margin: 5px 0;
+.tech-icons {
+    font-size: 1.2em; /* Iconos un pelín más pequeños */
+    display: flex;
+    gap: 15px;
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    font-size: 0.75em;
+    opacity: 0.6;
 }
