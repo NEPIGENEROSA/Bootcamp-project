@@ -73,6 +73,8 @@ Amedida que iba avanzando en el proyecto fueron surguendo nuevas ideas por lo qu
 voy a compartir el enlace aquí para acceder al documento y en él está el enlace para ver el video de la prueba inicial de la app.
 https://docs.google.com/document/d/1qspbMUYor2U-aBTBGk0wHWbk_HgeATbRne8cs6Czprs/edit?usp=sharing 
 Ahí está el enlace.
+Además dejo aqui una imagen del resultado final de mi app.
+<img width="1910" height="1078" alt="Captura de pantalla 2026-04-18 132646" src="https://github.com/user-attachments/assets/3158ec78-e28f-471a-ad96-d2f4bfc2aab8" />
 
 ## Subiré ademas en este Readme mi enlace de vercel. Aunque ya esta arriba.
 
