@@ -53,7 +53,7 @@ El proyecto consiste en una aplicación web de lista de tareas (To-Do List) avan
 
 -- Ejecución: Navega hasta la carpeta del proyecto y ejecuta el comando python app.py.
 
-A-- cceso: Abre tu navegador y escribe http://127.0.0.1:5000.
+-- Acceso: Abre tu navegador y escribe http://127.0.0.1:5000.
 
 ## Cómo desplegar en Vercel
 -- Sube tu código a un repositorio de GitHub.
