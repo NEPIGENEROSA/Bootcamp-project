@@ -257,3 +257,38 @@ button:hover { opacity: 0.8; }
     align-items: center;
     gap: 5px;
 }
+/* --- AJUSTES PARA MÓVIL --- */
+@media (max-width: 768px) {
+    /* La columna principal y el resumen ahora irán uno debajo de otro */
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px;
+    }
+
+    /* El resumen ya no flotará al lado, ocupará todo el ancho */
+    aside#estadisticas {
+        width: 100%;
+        position: static;
+        order: -1; /* Esto pone el resumen arriba para que se vea rápido */
+    }
+
+    /* Ajustamos el formulario para que no se amontone */
+    .input-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .input-group input, 
+    .input-group select, 
+    .input-group button {
+        width: 100% !important;
+        margin: 5px 0;
+    }
+
+    /* Título más pequeño para que no ocupe media pantalla */
+    h1 {
+        font-size: 2rem;
+    }
+}
