@@ -79,3 +79,37 @@ Además dejo aqui una imagen del resultado final de mi app.
 ## Subiré ademas en este Readme mi enlace de vercel. Aunque ya esta arriba.
 
 (https://vercel.com/kerima/v0-v0-nepigenerosa-adefa1ee)
+
+
+
+
+
+
+
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "templates/*.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "server.js"
+    },
+    {
+      "src": "/",
+      "dest": "templates/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "templates/$1"
+    }
+  ]
+}
