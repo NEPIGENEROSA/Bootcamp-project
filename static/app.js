@@ -35,14 +35,11 @@ async function agregarTarea() {
     }
 
     try {
-        const respuesta = await fetch('http://localhost:3000/api/v1/tasks', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                title: titulo, 
-                priority: prioridad.value 
-            })
-        });
+       const response = await fetch('/api/v1/tasks', { 
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(nuevaTarea)
+});
 
         if (respuesta.status === 201) {
             input.value = ''; // Limpiamos el input
