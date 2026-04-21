@@ -7,10 +7,11 @@ const sortTasks = document.getElementById('sort-tasks');
 const contenedorActivas = document.getElementById('lista-tareas-activas');
 const contenedorArchivo = document.getElementById('lista-archivo');
 
-const API_URL = 'http://localhost:3000/api/v1/tasks'; // La dirección de tu backend
+// ✅ RUTA CORREGIDA: Sin localhost para que funcione en Vercel y móvil
+const API_URL = '/api/v1/tasks'; 
 let tareas = [];
 
-// 2. Cargar Modo Noche desde LocalStorage (esto sí se queda en el navegador)
+// 2. Cargar Modo Noche desde LocalStorage
 if (localStorage.getItem('dark-mode') === 'true') {
     document.body.classList.add('dark-mode');
 }
@@ -22,56 +23,46 @@ function toggleDarkMode() {
     localStorage.setItem('dark-mode', isDark);
 }
 
-// --- NUEVA FUNCIÓN: CARGAR DESDE EL SERVIDOR ---
-// Sustituye tu función de agregar por esta:
-async function agregarTarea() {
-    const input = document.getElementById('input-tarea');
-    const prioridad = document.getElementById('select-prioridad'); // Elige el ID que tengas
-    const titulo = input.value.trim();
-
-    if (!titulo) {
-        alert("¡Oye! No puedes dejar el título vacío.");
-        return;
-    }
-
+// --- FUNCIÓN: CARGAR TAREAS DEL SERVIDOR ---
+async function cargarTareas() {
     try {
-       const response = await fetch('/api/v1/tasks', { 
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(nuevaTarea)
-});
-
-        if (respuesta.status === 201) {
-            input.value = ''; // Limpiamos el input
-            cargarTareas();   // Volvemos a pedir la lista al servidor para que se actualice
-        } else {
-            const error = await respuesta.json();
-            alert("El servidor dice que algo va mal: " + error.error);
+        const response = await fetch(API_URL);
+        if (response.ok) {
+            tareas = await response.json();
+            renderizarTareas();
         }
     } catch (error) {
-        alert("¡Vaya! Parece que el servidor está apagado.");
+        console.error("Error al cargar tareas:", error);
     }
 }
-// 4. Añadir nueva tarea (MODIFICADO para usar POST al servidor)
+
+// 4. Añadir nueva tarea (CORREGIDO)
 formulario.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
     const nuevaTarea = {
-        title: inputTarea.value, // Cambiado a 'title' para coincidir con el backend
+        title: inputTarea.value, 
         priority: inputPrioridad.value,
         estado: 'pendiente', 
         progreso: 0
     };
 
     try {
-        await fetch(API_URL, {
+        const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(nuevaTarea)
         });
-        inputTarea.value = '';
-        cargarTareas(); // Recargamos la lista desde el servidor
+
+        if (response.ok) {
+            inputTarea.value = '';
+            await cargarTareas(); // Recargamos la lista actualizada
+        } else {
+            alert("Error al guardar en el servidor");
+        }
     } catch (error) {
-        console.error("Error al guardar tarea:", error);
+        console.error("Error de red:", error);
+        alert("Parece que el servidor no responde.");
     }
 });
 
@@ -79,9 +70,10 @@ formulario.addEventListener('submit', async (e) => {
 if(filterPriority) filterPriority.addEventListener('change', renderizarTareas);
 if(sortTasks) sortTasks.addEventListener('change', renderizarTareas);
 
-// 5. Cambio de estados (Próxima fase: implementar PUT en el servidor)
-// De momento lo gestionamos en local y lo renderizamos
+// 5. Cambio de estados
 function cambiarEstado(id) {
+    // Nota: Para que sea permanente deberías hacer un PUT al servidor. 
+    // De momento lo gestionamos en local para que veas el cambio.
     tareas = tareas.map(t => {
         if (t.id === id) {
             if (t.estado === 'pendiente') { 
@@ -106,40 +98,39 @@ function actualizarProgreso(id, valor) {
     actualizarEstadisticas();
 }
 
-// 7. Eliminar
-async function borrarTarea(id) {
-    // Aquí puedes poner un "confirm" si quieres ser más precavida
+// 7. Eliminar (CORREGIDO: Sin localhost)
+async function eliminarTarea(id) {
     if (!confirm("¿Seguro que quieres borrarla?")) return;
 
     try {
-        const respuesta = await fetch(`http://localhost:3000/api/v1/tasks/${id}`, {
+        const response = await fetch(`${API_URL}/${id}`, {
             method: 'DELETE'
         });
 
-        if (respuesta.status === 204) {
-            console.log("Borrada con éxito (204 No Content)");
-            cargarTareas(); // Refrescamos la lista
+        if (response.ok) {
+            await cargarTareas(); 
         } else {
-            alert("No se pudo borrar, quizás ya no existe.");
+            alert("No se pudo borrar la tarea.");
         }
     } catch (error) {
-        alert("Error de red al intentar borrar.");
+        console.error("Error al borrar:", error);
     }
 }
-// 9. LÓGICA DE RENDERIZADO CON FILTROS Y ORDENACIÓN
+
+// 9. LÓGICA DE RENDERIZADO
 function renderizarTareas() {
     if(contenedorActivas) contenedorActivas.innerHTML = '';
     if(contenedorArchivo) contenedorArchivo.innerHTML = '';
 
     let tareasAMostrar = [...tareas];
 
-    // A) APLICAR FILTRO DE PRIORIDAD
+    // A) Filtro
     const filtro = filterPriority ? filterPriority.value : 'all';
     if (filtro !== 'all') {
         tareasAMostrar = tareasAMostrar.filter(t => t.priority === filtro);
     }
 
-    // B) APLICAR ORDENACIÓN
+    // B) Ordenación
     const orden = sortTasks ? sortTasks.value : 'date';
     const priorityOrder = { 'Alta': 1, 'Media': 2, 'Baja': 3 };
 
@@ -153,7 +144,7 @@ function renderizarTareas() {
         }
     });
 
-    // C) SEPARAR Y DIBUJAR
+    // C) Dibujar
     const activas = tareasAMostrar.filter(t => t.estado === 'proceso');
     const resto = tareasAMostrar.filter(t => t.estado !== 'proceso');
 
@@ -168,7 +159,7 @@ function renderizarTareas() {
     actualizarEstadisticas();
 }
 
-// 10. Función para crear el HTML de la tarjeta
+// 10. Crear HTML de la tarjeta
 function crearTarjetaHTML(tarea) {
     const card = document.createElement('div');
     card.className = 'task-card';
@@ -221,5 +212,5 @@ function actualizarEstadisticas() {
     if(document.getElementById('pendientes-tareas')) document.getElementById('pendientes-tareas').innerText = pendientes;
 }
 
-// Inicio - Cargamos desde el servidor al abrir la web
+// Inicio
 cargarTareas();
