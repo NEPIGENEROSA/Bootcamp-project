@@ -1,0 +1,31 @@
+{
+  "name": "miproyectoflask",
+  "version": "1.0.0",
+  "description": "Bootcamp-project\r En este repositorio subiré los códigos de la creación de mi aplicación de gestión de tareas llamada TaskFlow. Con TaskFlow podremos crear, completar, eliminar y filtrar tareas. TaskFlow es un gestor de tareas sencillo, rápido y con un diseño que mola.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NEPIGENEROSA/Bootcamp-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/NEPIGENEROSA/Bootcamp-project/issues"
+  },
+  "homepage": "https://github.com/NEPIGENEROSA/Bootcamp-project#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

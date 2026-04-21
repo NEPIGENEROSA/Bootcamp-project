@@ -1,14 +1,16 @@
 // 1. Elementos del DOM
 const formulario = document.getElementById('formulario-tarea');
 const inputTarea = document.getElementById('input-tarea');
-const inputPrioridad = document.getElementById('input-prioridad'); // NUEVO
-const filterPriority = document.getElementById('filter-priority'); // NUEVO
-const sortTasks = document.getElementById('sort-tasks'); // NUEVO
+const inputPrioridad = document.getElementById('input-prioridad');
+const filterPriority = document.getElementById('filter-priority');
+const sortTasks = document.getElementById('sort-tasks');
 const contenedorActivas = document.getElementById('lista-tareas-activas');
 const contenedorArchivo = document.getElementById('lista-archivo');
 
-// 2. Cargar tareas y Modo Noche desde LocalStorage
-let tareas = JSON.parse(localStorage.getItem('misTareas')) || [];
+const API_URL = 'http://localhost:3000/api/v1/tasks'; // La dirección de tu backend
+let tareas = [];
+
+// 2. Cargar Modo Noche desde LocalStorage (esto sí se queda en el navegador)
 if (localStorage.getItem('dark-mode') === 'true') {
     document.body.classList.add('dark-mode');
 }
@@ -20,26 +22,68 @@ function toggleDarkMode() {
     localStorage.setItem('dark-mode', isDark);
 }
 
-// 4. Añadir nueva tarea (MODIFICADO para incluir prioridad)
-formulario.addEventListener('submit', (e) => {
+// --- NUEVA FUNCIÓN: CARGAR DESDE EL SERVIDOR ---
+// Sustituye tu función de agregar por esta:
+async function agregarTarea() {
+    const input = document.getElementById('input-tarea');
+    const prioridad = document.getElementById('select-prioridad'); // Elige el ID que tengas
+    const titulo = input.value.trim();
+
+    if (!titulo) {
+        alert("¡Oye! No puedes dejar el título vacío.");
+        return;
+    }
+
+    try {
+        const respuesta = await fetch('http://localhost:3000/api/v1/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                title: titulo, 
+                priority: prioridad.value 
+            })
+        });
+
+        if (respuesta.status === 201) {
+            input.value = ''; // Limpiamos el input
+            cargarTareas();   // Volvemos a pedir la lista al servidor para que se actualice
+        } else {
+            const error = await respuesta.json();
+            alert("El servidor dice que algo va mal: " + error.error);
+        }
+    } catch (error) {
+        alert("¡Vaya! Parece que el servidor está apagado.");
+    }
+}
+// 4. Añadir nueva tarea (MODIFICADO para usar POST al servidor)
+formulario.addEventListener('submit', async (e) => {
     e.preventDefault();
     const nuevaTarea = {
-        id: Date.now(),
-        titulo: inputTarea.value,
-        prioridad: inputPrioridad.value, // GUARDAMOS LA PRIORIDAD
+        title: inputTarea.value, // Cambiado a 'title' para coincidir con el backend
+        priority: inputPrioridad.value,
         estado: 'pendiente', 
         progreso: 0
     };
-    tareas.push(nuevaTarea);
-    inputTarea.value = '';
-    guardarYRenderizar();
+
+    try {
+        await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nuevaTarea)
+        });
+        inputTarea.value = '';
+        cargarTareas(); // Recargamos la lista desde el servidor
+    } catch (error) {
+        console.error("Error al guardar tarea:", error);
+    }
 });
 
 // Escuchadores para Filtros y Ordenación
 if(filterPriority) filterPriority.addEventListener('change', renderizarTareas);
 if(sortTasks) sortTasks.addEventListener('change', renderizarTareas);
 
-// 5. Cambio de estados
+// 5. Cambio de estados (Próxima fase: implementar PUT en el servidor)
+// De momento lo gestionamos en local y lo renderizamos
 function cambiarEstado(id) {
     tareas = tareas.map(t => {
         if (t.id === id) {
@@ -56,31 +100,35 @@ function cambiarEstado(id) {
         }
         return t;
     });
-    guardarYRenderizar();
+    renderizarTareas();
 }
 
 // 6. Actualizar el porcentaje
 function actualizarProgreso(id, valor) {
     tareas = tareas.map(t => t.id === id ? {...t, progreso: parseInt(valor)} : t);
-    localStorage.setItem('misTareas', JSON.stringify(tareas));
-    // No renderizamos todo para no perder el foco del slider, solo actualizamos el número
     actualizarEstadisticas();
 }
 
 // 7. Eliminar
-function eliminarTarea(id) {
-    if (confirm('¿Estás segura de que quieres eliminar esta tarea?')) {
-        tareas = tareas.filter(t => t.id !== id);
-        guardarYRenderizar();
+async function borrarTarea(id) {
+    // Aquí puedes poner un "confirm" si quieres ser más precavida
+    if (!confirm("¿Seguro que quieres borrarla?")) return;
+
+    try {
+        const respuesta = await fetch(`http://localhost:3000/api/v1/tasks/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (respuesta.status === 204) {
+            console.log("Borrada con éxito (204 No Content)");
+            cargarTareas(); // Refrescamos la lista
+        } else {
+            alert("No se pudo borrar, quizás ya no existe.");
+        }
+    } catch (error) {
+        alert("Error de red al intentar borrar.");
     }
 }
-
-// 8. Guardar y Refrescar
-function guardarYRenderizar() {
-    localStorage.setItem('misTareas', JSON.stringify(tareas));
-    renderizarTareas();
-}
-
 // 9. LÓGICA DE RENDERIZADO CON FILTROS Y ORDENACIÓN
 function renderizarTareas() {
     if(contenedorActivas) contenedorActivas.innerHTML = '';
@@ -91,7 +139,7 @@ function renderizarTareas() {
     // A) APLICAR FILTRO DE PRIORIDAD
     const filtro = filterPriority ? filterPriority.value : 'all';
     if (filtro !== 'all') {
-        tareasAMostrar = tareasAMostrar.filter(t => t.prioridad === filtro);
+        tareasAMostrar = tareasAMostrar.filter(t => t.priority === filtro);
     }
 
     // B) APLICAR ORDENACIÓN
@@ -100,11 +148,11 @@ function renderizarTareas() {
 
     tareasAMostrar.sort((a, b) => {
         if (orden === 'alpha') {
-            return a.titulo.localeCompare(b.titulo);
+            return (a.title || "").localeCompare(b.title || "");
         } else if (orden === 'priority') {
-            return priorityOrder[a.prioridad] - priorityOrder[b.prioridad];
+            return priorityOrder[a.priority] - priorityOrder[b.priority];
         } else {
-            return b.id - a.id; // Fecha (más recientes primero)
+            return b.id - a.id; 
         }
     });
 
@@ -127,7 +175,7 @@ function renderizarTareas() {
 function crearTarjetaHTML(tarea) {
     const card = document.createElement('div');
     card.className = 'task-card';
-    card.setAttribute('data-priority', tarea.prioridad); // Importante para CSS si se necesita
+    card.setAttribute('data-priority', tarea.priority);
     
     let controlProgreso = '';
     if (tarea.estado === 'proceso') {
@@ -144,9 +192,9 @@ function crearTarjetaHTML(tarea) {
 
     card.innerHTML = `
         <h3 style="${tarea.estado === 'completada' ? 'text-decoration: line-through; opacity: 0.6' : ''}">
-            ${tarea.titulo}
+            ${tarea.title}
         </h3>
-        <span class="badge badge-${tarea.prioridad}">${tarea.prioridad}</span>
+        <span class="badge badge-${tarea.priority}">${tarea.priority}</span>
         <div class="progress-container">
             <div class="progress-bar" style="width: ${tarea.progreso}%"></div>
         </div>
@@ -176,5 +224,5 @@ function actualizarEstadisticas() {
     if(document.getElementById('pendientes-tareas')) document.getElementById('pendientes-tareas').innerText = pendientes;
 }
 
-// Inicio
-renderizarTareas();
+// Inicio - Cargamos desde el servidor al abrir la web
+cargarTareas();
