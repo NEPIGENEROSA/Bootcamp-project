@@ -1,3 +1,4 @@
+alert("¡EL CÓDIGO NUEVO ESTÁ CARGADO!");
 // 1. Elementos del DOM
 const formulario = document.getElementById('formulario-tarea');
 const inputTarea = document.getElementById('input-tarea');
