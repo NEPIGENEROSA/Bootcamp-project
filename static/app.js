@@ -1,4 +1,14 @@
-alert("¡EL CÓDIGO NUEVO ESTÁ CARGADO!");
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("¡JS cargado y DOM listo!");
+    alert("V3 - CONTROL DE CACHE");
+
+    // Todo tu código actual va aquí dentro...
+    const formulario = document.getElementById('formulario-tarea');
+    // ... (el resto de tus constantes y funciones)
+    
+    // Al final del todo, dentro del cierre, llamas a cargar:
+    cargarTareas();
+});
 // 1. Elementos del DOM
 const formulario = document.getElementById('formulario-tarea');
 const inputTarea = document.getElementById('input-tarea');
@@ -9,7 +19,7 @@ const contenedorActivas = document.getElementById('lista-tareas-activas');
 const contenedorArchivo = document.getElementById('lista-archivo');
 
 // ✅ RUTA CORREGIDA: Sin localhost para que funcione en Vercel y móvil
-const API_URL = '/api/v1/tasks'; 
+const API_URL = '/api/v1/tasks';
 let tareas = [];
 
 // 2. Cargar Modo Noche desde LocalStorage
