@@ -1,227 +1,157 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("¡JS cargado y DOM listo!");
-    alert("V3 - CONTROL DE CACHE");
+    console.log("¡JS cargado y funcionando!");
+    alert("V4 - SOLUCIÓN DEFINITIVA");
 
-    // Todo tu código actual va aquí dentro...
+    // 1. Elementos del DOM
     const formulario = document.getElementById('formulario-tarea');
-    // ... (el resto de tus constantes y funciones)
-    
-    // Al final del todo, dentro del cierre, llamas a cargar:
-    cargarTareas();
-});
-// 1. Elementos del DOM
-const formulario = document.getElementById('formulario-tarea');
-const inputTarea = document.getElementById('input-tarea');
-const inputPrioridad = document.getElementById('input-prioridad');
-const filterPriority = document.getElementById('filter-priority');
-const sortTasks = document.getElementById('sort-tasks');
-const contenedorActivas = document.getElementById('lista-tareas-activas');
-const contenedorArchivo = document.getElementById('lista-archivo');
+    const inputTarea = document.getElementById('input-tarea');
+    const inputPrioridad = document.getElementById('input-prioridad');
+    const filterPriority = document.getElementById('filter-priority');
+    const sortTasks = document.getElementById('sort-tasks');
+    const contenedorActivas = document.getElementById('lista-tareas-activas');
+    const contenedorArchivo = document.getElementById('lista-archivo');
 
-// ✅ RUTA CORREGIDA: Sin localhost para que funcione en Vercel y móvil
-const API_URL = '/api/v1/tasks';
-let tareas = [];
+    // 2. Estado de la aplicación (Cargamos de LocalStorage para que no falle)
+    let tareas = JSON.parse(localStorage.getItem('mis-tareas-v4')) || [];
 
-// 2. Cargar Modo Noche desde LocalStorage
-if (localStorage.getItem('dark-mode') === 'true') {
-    document.body.classList.add('dark-mode');
-}
-
-// 3. Función Modo Noche
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('dark-mode', isDark);
-}
-
-// --- FUNCIÓN: CARGAR TAREAS DEL SERVIDOR ---
-async function cargarTareas() {
-    try {
-        const response = await fetch(API_URL);
-        if (response.ok) {
-            tareas = await response.json();
-            renderizarTareas();
-        }
-    } catch (error) {
-        console.error("Error al cargar tareas:", error);
+    // 3. Modo Noche
+    if (localStorage.getItem('dark-mode') === 'true') {
+        document.body.classList.add('dark-mode');
     }
-}
 
-// 4. Añadir nueva tarea (CORREGIDO)
-formulario.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const nuevaTarea = {
-        title: inputTarea.value, 
-        priority: inputPrioridad.value,
-        estado: 'pendiente', 
-        progreso: 0
+    window.toggleDarkMode = function() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('dark-mode', isDark);
     };
 
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(nuevaTarea)
-        });
+    // 4. AÑADIR TAREA (CORREGIDO Y SIN DEPENDER DE API EXTERNA)
+    formulario.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const nuevaTarea = {
+            id: Date.now(), // ID único
+            title: inputTarea.value, 
+            priority: inputPrioridad.value,
+            estado: 'pendiente', 
+            progreso: 0
+        };
 
-        if (response.ok) {
-            inputTarea.value = '';
-            await cargarTareas(); // Recargamos la lista actualizada
-        } else {
-            alert("Error al guardar en el servidor");
-        }
-    } catch (error) {
-        console.error("Error de red:", error);
-        alert("Parece que el servidor no responde.");
-    }
-});
+        tareas.push(nuevaTarea);
+        guardarYRenderizar();
+        inputTarea.value = '';
+    });
 
-// Escuchadores para Filtros y Ordenación
-if(filterPriority) filterPriority.addEventListener('change', renderizarTareas);
-if(sortTasks) sortTasks.addEventListener('change', renderizarTareas);
-
-// 5. Cambio de estados
-function cambiarEstado(id) {
-    // Nota: Para que sea permanente deberías hacer un PUT al servidor. 
-    // De momento lo gestionamos en local para que veas el cambio.
-    tareas = tareas.map(t => {
-        if (t.id === id) {
-            if (t.estado === 'pendiente') { 
-                t.estado = 'proceso'; 
-                t.progreso = 20; 
-            } else if (t.estado === 'proceso') { 
-                t.estado = 'completada'; 
-                t.progreso = 100; 
-            } else { 
-                t.estado = 'pendiente'; 
-                t.progreso = 0; 
+    // 5. CAMBIAR ESTADO
+    window.cambiarEstado = function(id) {
+        tareas = tareas.map(t => {
+            if (t.id === id) {
+                if (t.estado === 'pendiente') { t.estado = 'proceso'; t.progreso = 20; }
+                else if (t.estado === 'proceso') { t.estado = 'completada'; t.progreso = 100; }
+                else { t.estado = 'pendiente'; t.progreso = 0; }
             }
+            return t;
+        });
+        guardarYRenderizar();
+    };
+
+    // 6. ELIMINAR
+    window.eliminarTarea = function(id) {
+        if (!confirm("¿Seguro que quieres borrarla?")) return;
+        tareas = tareas.filter(t => t.id !== id);
+        guardarYRenderizar();
+    };
+
+    // 7. ACTUALIZAR PROGRESO
+    window.actualizarProgreso = function(id, valor) {
+        tareas = tareas.map(t => t.id === id ? {...t, progreso: parseInt(valor)} : t);
+        actualizarEstadisticas();
+        localStorage.setItem('mis-tareas-v4', JSON.stringify(tareas));
+    };
+
+    // 8. RENDERIZADO
+    function renderizarTareas() {
+        if(contenedorActivas) contenedorActivas.innerHTML = '';
+        if(contenedorArchivo) contenedorArchivo.innerHTML = '';
+
+        let tareasAMostrar = [...tareas];
+
+        // Filtro
+        const filtro = filterPriority ? filterPriority.value : 'all';
+        if (filtro !== 'all') {
+            tareasAMostrar = tareasAMostrar.filter(t => t.priority === filtro);
         }
-        return t;
-    });
-    renderizarTareas();
-}
 
-// 6. Actualizar el porcentaje
-function actualizarProgreso(id, valor) {
-    tareas = tareas.map(t => t.id === id ? {...t, progreso: parseInt(valor)} : t);
-    actualizarEstadisticas();
-}
-
-// 7. Eliminar (CORREGIDO: Sin localhost)
-async function eliminarTarea(id) {
-    if (!confirm("¿Seguro que quieres borrarla?")) return;
-
-    try {
-        const response = await fetch(`${API_URL}/${id}`, {
-            method: 'DELETE'
+        // Ordenación
+        const orden = sortTasks ? sortTasks.value : 'date';
+        const priorityOrder = { 'Alta': 1, 'Media': 2, 'Baja': 3 };
+        tareasAMostrar.sort((a, b) => {
+            if (orden === 'alpha') return a.title.localeCompare(b.title);
+            if (orden === 'priority') return priorityOrder[a.priority] - priorityOrder[b.priority];
+            return b.id - a.id; 
         });
 
-        if (response.ok) {
-            await cargarTareas(); 
-        } else {
-            alert("No se pudo borrar la tarea.");
-        }
-    } catch (error) {
-        console.error("Error al borrar:", error);
-    }
-}
+        // Dibujar
+        tareasAMostrar.forEach(tarea => {
+            const html = crearTarjetaHTML(tarea);
+            if (tarea.estado === 'proceso') {
+                contenedorActivas.appendChild(html);
+            } else {
+                contenedorArchivo.appendChild(html);
+            }
+        });
 
-// 9. LÓGICA DE RENDERIZADO
-function renderizarTareas() {
-    if(contenedorActivas) contenedorActivas.innerHTML = '';
-    if(contenedorArchivo) contenedorArchivo.innerHTML = '';
-
-    let tareasAMostrar = [...tareas];
-
-    // A) Filtro
-    const filtro = filterPriority ? filterPriority.value : 'all';
-    if (filtro !== 'all') {
-        tareasAMostrar = tareasAMostrar.filter(t => t.priority === filtro);
+        actualizarEstadisticas();
     }
 
-    // B) Ordenación
-    const orden = sortTasks ? sortTasks.value : 'date';
-    const priorityOrder = { 'Alta': 1, 'Media': 2, 'Baja': 3 };
-
-    tareasAMostrar.sort((a, b) => {
-        if (orden === 'alpha') {
-            return (a.title || "").localeCompare(b.title || "");
-        } else if (orden === 'priority') {
-            return priorityOrder[a.priority] - priorityOrder[b.priority];
-        } else {
-            return b.id - a.id; 
-        }
-    });
-
-    // C) Dibujar
-    const activas = tareasAMostrar.filter(t => t.estado === 'proceso');
-    const resto = tareasAMostrar.filter(t => t.estado !== 'proceso');
-
-    activas.slice(0, 3).forEach(tarea => {
-        contenedorActivas.appendChild(crearTarjetaHTML(tarea));
-    });
-
-    resto.forEach(tarea => {
-        contenedorArchivo.appendChild(crearTarjetaHTML(tarea));
-    });
-
-    actualizarEstadisticas();
-}
-
-// 10. Crear HTML de la tarjeta
-function crearTarjetaHTML(tarea) {
-    const card = document.createElement('div');
-    card.className = 'task-card';
-    card.setAttribute('data-priority', tarea.priority);
-    
-    let controlProgreso = '';
-    if (tarea.estado === 'proceso') {
-        controlProgreso = `
+    function crearTarjetaHTML(tarea) {
+        const card = document.createElement('div');
+        card.className = 'task-card';
+        card.setAttribute('data-priority', tarea.priority);
+        
+        let controlProgreso = tarea.estado === 'proceso' ? `
             <div style="margin-top:10px">
                 <input type="range" min="0" max="100" value="${tarea.progreso}" 
                  oninput="actualizarProgreso(${tarea.id}, this.value)">
                 <span style="font-size: 0.8em">${tarea.progreso}%</span>
+            </div>` : '';
+
+        let btnTexto = tarea.estado === 'pendiente' ? 'Empezar' : (tarea.estado === 'proceso' ? 'Finalizar' : 'Reiniciar');
+        let btnIcono = tarea.estado === 'pendiente' ? 'fa-play' : (tarea.estado === 'proceso' ? 'fa-check' : 'fa-redo');
+
+        card.innerHTML = `
+            <h3 style="${tarea.estado === 'completada' ? 'text-decoration: line-through; opacity: 0.6' : ''}">${tarea.title}</h3>
+            <span class="badge badge-${tarea.priority}">${tarea.priority}</span>
+            <div class="progress-container"><div class="progress-bar" style="width: ${tarea.progreso}%"></div></div>
+            ${controlProgreso}
+            <div style="margin-top:15px">
+                <button onclick="cambiarEstado(${tarea.id})"><i class="fas ${btnIcono}"></i> ${btnTexto}</button>
+                <button style="background:#ff4757; margin-left:10px" onclick="eliminarTarea(${tarea.id})"><i class="fas fa-trash"></i></button>
             </div>`;
+        return card;
     }
 
-    let btnTexto = tarea.estado === 'pendiente' ? 'Empezar' : (tarea.estado === 'proceso' ? 'Finalizar' : 'Reiniciar');
-    let btnIcono = tarea.estado === 'pendiente' ? 'fa-play' : (tarea.estado === 'proceso' ? 'fa-check' : 'fa-redo');
+    function actualizarEstadisticas() {
+        const total = tareas.length;
+        const completadas = tareas.filter(t => t.estado === 'completada').length;
+        const enProceso = tareas.filter(t => t.estado === 'proceso').length;
+        const pendientes = total - completadas - enProceso;
 
-    card.innerHTML = `
-        <h3 style="${tarea.estado === 'completada' ? 'text-decoration: line-through; opacity: 0.6' : ''}">
-            ${tarea.title}
-        </h3>
-        <span class="badge badge-${tarea.priority}">${tarea.priority}</span>
-        <div class="progress-container">
-            <div class="progress-bar" style="width: ${tarea.progreso}%"></div>
-        </div>
-        ${controlProgreso}
-        <div style="margin-top:15px">
-            <button onclick="cambiarEstado(${tarea.id})">
-                <i class="fas ${btnIcono}"></i> ${btnTexto}
-            </button>
-            <button style="background:#ff4757; margin-left:10px" onclick="eliminarTarea(${tarea.id})">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-    `;
-    return card;
-}
+        if(document.getElementById('total-tareas')) document.getElementById('total-tareas').innerText = total;
+        if(document.getElementById('completadas-tareas')) document.getElementById('completadas-tareas').innerText = completadas;
+        if(document.getElementById('en-proceso-tareas')) document.getElementById('en-proceso-tareas').innerText = enProceso;
+        if(document.getElementById('pendientes-tareas')) document.getElementById('pendientes-tareas').innerText = pendientes;
+    }
 
-// 11. Estadísticas
-function actualizarEstadisticas() {
-    const total = tareas.length;
-    const completadas = tareas.filter(t => t.estado === 'completada').length;
-    const enProceso = tareas.filter(t => t.estado === 'proceso').length;
-    const pendientes = total - completadas - enProceso;
+    function guardarYRenderizar() {
+        localStorage.setItem('mis-tareas-v4', JSON.stringify(tareas));
+        renderizarTareas();
+    }
 
-    if(document.getElementById('total-tareas')) document.getElementById('total-tareas').innerText = total;
-    if(document.getElementById('completadas-tareas')) document.getElementById('completadas-tareas').innerText = completadas;
-    if(document.getElementById('en-proceso-tareas')) document.getElementById('en-proceso-tareas').innerText = enProceso;
-    if(document.getElementById('pendientes-tareas')) document.getElementById('pendientes-tareas').innerText = pendientes;
-}
+    // Escuchadores de filtros
+    if(filterPriority) filterPriority.addEventListener('change', renderizarTareas);
+    if(sortTasks) sortTasks.addEventListener('change', renderizarTareas);
 
-// Inicio
-cargarTareas();
+    // Inicio inicial
+    renderizarTareas();
+});
