@@ -1,3 +1,4 @@
+
 // ─── Estado local (caché mientras usas la app) ───────────────
 let tareas = [];
 
